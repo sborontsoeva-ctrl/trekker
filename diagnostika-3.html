@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Финансовая диагностика — Светлана Боронцоева</title>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#1D9E75;--green-light:#E1F5EE;--green-dark:#085041;--red:#E24B4A;--red-light:#FCEBEB;--red-dark:#791F1F;--amber:#EF9F27;--amber-light:#FAEEDA;--blue:#378ADD;--blue-light:#E6F1FB;--bg:#f8f7f4;--card:#fff;--border:#e8e6e0;--text:#1a1a1a;--muted:#888}
+body{font-family:'Golos Text',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px 60px}
+.container{max-width:680px;margin:0 auto}
+.logo-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.logo{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--green)}
+.logo-sub{font-size:12px;color:var(--muted)}
+h1{font-family:'Unbounded',sans-serif;font-size:clamp(22px,5vw,30px);font-weight:900;line-height:1.2;margin-bottom:12px}
+h1 span{color:var(--green)}
+.sub{font-size:15px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:14px}
+.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.drop-zone:hover,.drop-zone.over{border-color:var(--green);background:var(--green-light)}
+.drop-icon{font-size:36px;margin-bottom:10px}
+.drop-title{font-size:15px;font-weight:600;margin-bottom:5px}
+.drop-sub{font-size:13px;color:var(--muted)}
+.formats{display:flex;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.fmt-badge{background:#f0f0ec;border-radius:6px;padding:3px 10px;font-size:12px;color:var(--muted);font-weight:500}
+.files-list{margin-bottom:12px}
+.file-chip{display:flex;align-items:center;gap:8px;background:#f0f0ec;border-radius:8px;padding:7px 12px;font-size:13px;margin-bottom:6px}
+.file-chip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-chip button{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;flex-shrink:0}
+.add-more{display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--muted);cursor:pointer;width:100%;justify-content:center;transition:all .2s;margin-bottom:12px}
+.add-more:hover{border-color:var(--green);color:var(--green)}
+.btn{display:block;width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:12px;font-family:'Golos Text',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--green-dark)}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.btn-outline{background:none;border:1.5px solid var(--border);color:var(--text);padding:10px 18px;border-radius:10px;font-family:'Golos Text',sans-serif;font-size:14px;cursor:pointer}
+.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+.error{background:var(--red-light);border:1px solid #F7C1C1;border-radius:10px;padding:12px 16px;color:var(--red-dark);font-size:14px;margin-bottom:12px}
+.hidden{display:none!important}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.spin{display:inline-block;width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.metric{background:#f8f7f4;border-radius:12px;padding:14px}
+.metric-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.metric-value{font-size:clamp(14px,3vw,20px);font-weight:600}
+.positive{color:var(--green-dark)}.negative{color:var(--red-dark)}
+.section-title{font-size:15px;font-weight:600;margin-bottom:12px}
+.rating-wrap{display:flex;align-items:center;gap:16px;padding:14px;background:#f8f7f4;border-radius:12px}
+.rating-circle{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0}
+.cat-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.cat-row:last-child{border-bottom:none}
+.cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cat-name{flex:1;text-transform:capitalize}
+.cat-amt{font-weight:600;min-width:90px;text-align:right}
+.cat-pct{color:var(--muted);min-width:36px;text-align:right;font-size:13px}
+.hole-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.hole-item:last-child{border-bottom:none}
+.hole-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.hole-cat{font-size:14px;font-weight:600;text-transform:capitalize}
+.hole-badge{background:var(--red-light);color:var(--red-dark);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.hole-bar-bg{height:6px;background:#f0f0ec;border-radius:3px;margin-bottom:5px}
+.hole-bar-fill{height:100%;border-radius:3px;background:var(--red)}
+.hole-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.rec-item{padding:10px 14px;border-left:3px solid var(--green);background:var(--green-light);border-radius:0 10px 10px 0;font-size:14px;line-height:1.5;margin-bottom:8px}
+.rec-item.warn{border-left-color:var(--amber);background:var(--amber-light)}
+.rec-item.danger{border-left-color:var(--red);background:var(--red-light)}
+.chart-wrap{position:relative;height:200px;margin-bottom:12px}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.result-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700}
+.period-badge{background:var(--green-light);color:var(--green-dark);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.sources-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.source-tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500}
+
+/* БЛОК КАПИТАЛА */
+.capital-block{border-radius:16px;overflow:hidden;margin-bottom:14px}
+.capital-header{background:linear-gradient(135deg,#0F6E56,#1D9E75);padding:20px 22px;color:#fff}
+.capital-header-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
+.capital-header-sub{font-size:13px;opacity:.9;line-height:1.5}
+.capital-steps{background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 16px 16px}
+.capital-scenario{padding:16px 20px;border-bottom:1px solid var(--border)}
+.capital-scenario:last-child{border-bottom:none}
+.scenario-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;user-select:none}
+.scenario-icon{font-size:20px;flex-shrink:0}
+.scenario-title{font-size:14px;font-weight:600;flex:1}
+.scenario-arrow{font-size:12px;color:var(--muted);transition:transform .2s}
+.scenario-arrow.open{transform:rotate(180deg)}
+.scenario-body{font-size:13px;line-height:1.7;color:#444}
+.scenario-body.hidden{display:none}
+.step-list{list-style:none;margin-top:8px}
+.step-list li{display:flex;gap:8px;margin-bottom:6px}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-num.red{background:var(--red)}
+.step-num.amber{background:var(--amber)}
+.step-num.blue{background:var(--blue)}
+.highlight{background:var(--green-light);border-radius:6px;padding:8px 12px;margin-top:8px;font-size:13px;color:var(--green-dark);font-weight:500}
+.highlight.warn{background:var(--amber-light);color:#633806}
+.highlight.danger{background:var(--red-light);color:var(--red-dark)}
+
+/* CTA */
+.cta-card{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:16px;padding:24px;margin-bottom:14px;color:#fff;text-align:center}
+.cta-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px}
+.cta-sub{font-size:13px;opacity:.9;line-height:1.6;margin-bottom:18px}
+.cta-btn{display:inline-block;padding:13px 26px;background:#fff;color:var(--green-dark);border:none;border-radius:12px;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.sub-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.sub-item:last-child{border-bottom:none}
+.sub-icon{font-size:20px;flex-shrink:0;width:32px;text-align:center}
+.sub-info{flex:1}
+.sub-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.sub-desc{font-size:12px;color:var(--muted)}
+.sub-right{text-align:right;flex-shrink:0}
+.sub-amt{font-size:14px;font-weight:600;color:var(--red-dark)}
+.sub-freq{font-size:11px;color:var(--muted);margin-bottom:4px}
+.sub-cancel{font-size:11px;color:var(--blue);text-decoration:none;cursor:pointer}
+.sub-cancel:hover{text-decoration:underline}
+.sub-unknown-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.sub-unknown-item:last-child{border-bottom:none}
+;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px}
+.cr-row input,.cr-row select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:'Golos Text',sans-serif;font-size:13px;width:100%;background:#fafaf8}
+.cr-row input:focus,.cr-row select:focus{outline:none;border-color:var(--green)}
+.cr-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px;line-height:1}
+.cr-del:hover{color:var(--red)}
+.cr-headers{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:6px}
+.cr-header-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cr-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.cr-item:last-child{border-bottom:none}
+.cr-item-name{flex:1;font-weight:500}
+.cr-item-rate{padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.rate-high{background:var(--red-light);color:var(--red-dark)}
+.rate-mid{background:var(--amber-light);color:#633806}
+.rate-ok{background:var(--green-light);color:var(--green-dark)}
+@media(max-width:520px){.cr-row{grid-template-columns:1fr 1fr;}.cr-row input:first-child{grid-column:1/-1}.cr-headers{display:none}}
+
+.feature{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.feature-icon{font-size:20px;margin-bottom:5px}
+.feature-text{font-size:12px;color:var(--muted)}
+@media(max-width:480px){.metrics{grid-template-columns:1fr}.cat-amt{min-width:80px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo-bar">
+    <div class="logo">💰 Финансовая диагностика</div>
+    <div class="logo-sub">by Светлана Боронцоева</div>
+  </div>
+
+  <!-- ЗАГРУЗКА -->
+  <div id="screen-upload">
+    <h1>Узнайте, куда <span>уходят</span> ваши деньги</h1>
+    <p class="sub">Загрузите выписки из всех банков сразу — получите полную картину финансов, найдём утечки и покажем с чего начать строить капитал.</p>
+    <div class="card">
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="drop-icon">📂</div>
+        <div class="drop-title">Перетащите файлы или нажмите</div>
+        <div class="drop-sub">Тбанк, Сбербанк и другие банки — можно сразу несколько</div>
+        <div class="formats">
+          <span class="fmt-badge">PDF</span>
+          <span class="fmt-badge">CSV</span>
+          <span class="fmt-badge">XLSX</span>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf,.csv,.xlsx,.xls" multiple style="display:none">
+      </div>
+      <div id="filesList" class="files-list hidden"></div>
+      <button class="add-more hidden" id="addMoreBtn" onclick="document.getElementById('fileInput2').click()">
+        + Добавить ещё выписку
+        <input type="file" id="fileInput2" accept=".pdf,.csv,.xlsx,.xls" multiple style="display:none">
+      </button>
+      <div id="errorBox" class="error hidden"></div>
+      <button class="btn" id="analyzeBtn" onclick="startAnalysis()" disabled>Анализировать все выписки</button>
+      <p class="note">Файлы не отправляются на сервер — всё обрабатывается в вашем браузере</p>
+    </div>
+    <div class="features">
+      <div class="feature"><div class="feature-icon">🏦</div><div class="feature-text">Все банки в одном отчёте</div></div>
+      <div class="feature"><div class="feature-icon">⭐</div><div class="feature-text">Финансовый рейтинг</div></div>
+      <div class="feature"><div class="feature-icon">⚠️</div><div class="feature-text">Поиск утечек</div></div>
+      <div class="feature"><div class="feature-icon">📈</div><div class="feature-text">С чего начать капитал</div></div>
+    </div>
+  </div>
+
+  <!-- ЗАГРУЗКА -->
+  <div id="screen-loading" class="hidden">
+    <div class="loading"><div class="spin"></div><div id="loadingText" style="font-size:14px;margin-top:8px">Читаем файлы...</div></div>
+  </div>
+
+  <!-- РЕЗУЛЬТАТ -->
+  <div id="screen-result" class="hidden">
+    <div class="header-row">
+      <div class="result-title">📊 Сводная диагностика</div>
+      <button class="btn-outline" onclick="resetUpload()">← Новый анализ</button>
+    </div>
+
+    <div id="sourcesTags" class="sources-bar"></div>
+
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Доходы</div><div class="metric-value positive" id="r-income">—</div></div>
+      <div class="metric"><div class="metric-label">Расходы</div><div class="metric-value negative" id="r-expense">—</div></div>
+      <div class="metric"><div class="metric-label">Остаток</div><div class="metric-value" id="r-balance">—</div></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">⭐ Финансовый рейтинг</div>
+      <div class="rating-wrap">
+        <div class="rating-circle" id="r-circle"></div>
+        <div><div style="font-size:12px;color:var(--muted);margin-bottom:4px">из 100 баллов</div><div style="font-size:14px;line-height:1.5" id="r-desc"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📈 Расходы по категориям</div>
+      <div class="chart-wrap"><canvas id="pieChart"></canvas></div>
+      <div id="r-cats"></div>
+    </div>
+
+    <div class="card"><div class="section-title">⚠️ Финансовые утечки</div><div id="r-holes"></div></div>
+    <div class="card"><div class="section-title">💡 Первые шаги</div><div id="r-recs"></div></div>
+
+    <!-- БЛОК КАПИТАЛА -->
+    <div class="capital-block">
+      <div class="capital-header">
+        <div class="capital-header-title">📈 С чего начать строить капитал</div>
+        <div class="capital-header-sub">Найдите свою ситуацию и следуйте алгоритму. Если не уверены — запишитесь на разбор.</div>
+      </div>
+      <div class="capital-steps">
+
+        <div class="capital-scenario">
+          <div class="scenario-header" onclick="toggleScenario(this)">
+            <div class="scenario-icon">🚨</div>
+            <div class="scenario-title">У меня есть кредитные карты или займы в МФО</div>
+            <div class="scenario-arrow open">▼</div>
+          </div>
+          <div class="scenario-body">
+            <ul class="step-list">
+              <li><div class="step-num red">1</div><div>Это самые дорогие долги (20-50% годовых). Погашение — приоритет №1.</div></li>
+              <li><div class="step-num red">2</div><div>Параллельно ищите способы увеличить доход — фриланс, подработка, монетизация навыков.</div></li>
+              <li><div class="step-num red">3</div><div>Каждый дополнительный рубль дохода — сначала на погашение долга.</div></li>
+              <li><div class="step-num red">4</div><div>Пока долг не закрыт — не инвестируйте. Доходность инвестиций не перекроет 30-50% по карте.</div></li>
+            </ul>
+            <div class="highlight danger">Как только закроете карту — сразу переходите к следующему сценарию.</div>
+          </div>
+        </div>
+
+        <div class="capital-scenario">
+          <div class="scenario-header" onclick="toggleScenario(this)">
+            <div class="scenario-icon">⚠️</div>
+            <div class="scenario-title">У меня потребительский кредит выше 20% годовых</div>
+            <div class="scenario-arrow">▼</div>
+          </div>
+          <div class="scenario-body hidden">
+            <ul class="step-list">
+              <li><div class="step-num amber">1</div><div>Увеличивайте доход — это главный инструмент на этом этапе.</div></li>
+              <li><div class="step-num amber">2</div><div>Разделите дополнительный доход: 80% — на досрочное погашение, 20% — в подушку безопасности.</div></li>
+              <li><div class="step-num amber">3</div><div>Подушка — минимум 1 месячный расход на накопительном счёте.</div></li>
+              <li><div class="step-num amber">4</div><div>Рассмотрите рефинансирование — если есть предложения ниже 15%.</div></li>
+            </ul>
+            <div class="highlight warn">Стратегию досрочного погашения — снежный ком или лавина — лучше разобрать на разборе индивидуально.</div>
+          </div>
+        </div>
+
+        <div class="capital-scenario">
+          <div class="scenario-header" onclick="toggleScenario(this)">
+            <div class="scenario-icon">🏠</div>
+            <div class="scenario-title">У меня ипотека выше 13% годовых</div>
+            <div class="scenario-arrow">▼</div>
+          </div>
+          <div class="scenario-body hidden">
+            <ul class="step-list">
+              <li><div class="step-num amber">1</div><div>Увеличивайте доход и направляйте часть на досрочное погашение ипотеки.</div></li>
+              <li><div class="step-num amber">2</div><div>Досрочное погашение делайте правильно — уменьшение срока выгоднее чем уменьшение платежа.</div></li>
+              <li><div class="step-num amber">3</div><div>Следите за ставкой ЦБ — при снижении ставок рефинансируйте ипотеку.</div></li>
+              <li><div class="step-num amber">4</div><div>Небольшую часть дохода (5-10%) можно начать инвестировать параллельно.</div></li>
+            </ul>
+            <div class="highlight warn">Конкретную стратегию — сколько на погашение, сколько в инвестиции — разберём на разборе.</div>
+          </div>
+        </div>
+
+        <div class="capital-scenario">
+          <div class="scenario-header" onclick="toggleScenario(this)">
+            <div class="scenario-icon">✅</div>
+            <div class="scenario-title">Долгов нет или ипотека до 13% — готова строить капитал</div>
+            <div class="scenario-arrow">▼</div>
+          </div>
+          <div class="scenario-body hidden">
+            <ul class="step-list">
+              <li><div class="step-num">1</div><div><b>Подушка безопасности</b> — 3-6 месячных расходов на накопительном счёте или в ОФЗ. Это фундамент.</div></li>
+              <li><div class="step-num">2</div><div><b>Увеличивайте доход</b> — капитал растёт быстрее когда есть что инвестировать.</div></li>
+              <li><div class="step-num">3</div><div><b>Начните инвестировать</b> — от 10% дохода. ИИС, ОФЗ, дивидендные акции, недвижимость.</div></li>
+              <li><div class="step-num">4</div><div><b>Недвижимость</b> — рассмотрите торги по госимуществу: можно войти с меньшим капиталом чем по рынку.</div></li>
+            </ul>
+            <div class="highlight">Цель — чтобы деньги работали и приносили доход без вашего участия. Разберём вашу стратегию на разборе.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- БЛОК КРЕДИТОВ -->
+    <div class="card" id="credit-block">
+      <div class="section-title">💳 Следующий шаг — загрузите данные по кредитам</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">Введите ваши кредиты — посчитаем общий долг, переплату и покажем сколько лет вы отдаёте деньги банкам. Стратегию погашения разберём на курсе.</p>
+
+      <div id="credits-list"></div>
+      <button class="add-more" id="addCreditBtn" onclick="addCredit()" style="margin-bottom:14px">+ Добавить кредит</button>
+
+      <div id="credit-result" class="hidden">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
+          <div class="metric"><div class="metric-label">Общий долг</div><div class="metric-value negative" id="cr-total-debt">—</div></div>
+          <div class="metric"><div class="metric-label">Общий платёж/мес</div><div class="metric-value" id="cr-total-payment">—</div></div>
+          <div class="metric"><div class="metric-label">Переплата банкам</div><div class="metric-value negative" id="cr-overpay">—</div></div>
+          <div class="metric"><div class="metric-label">% дохода на долги</div><div class="metric-value" id="cr-burden">—</div></div>
+        </div>
+
+        <div id="cr-alert" class="rec-item danger hidden"></div>
+
+        <div style="background:linear-gradient(135deg,#f8f7f4,#fff);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:8px">📊 Разбивка по кредитам</div>
+          <div id="cr-breakdown"></div>
+        </div>
+
+        <div style="background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:14px;margin-bottom:14px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">⚡ Что дальше?</div>
+          <div style="font-size:13px;line-height:1.6;color:#444">
+            Вы видите общую картину долговой нагрузки. Но <b>стратегия погашения — это индивидуально</b>: снежный ком, лавина, досрочное погашение, рефинансирование — что выгоднее именно вам зависит от ставок, сроков и вашего дохода.
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:14px;padding:20px;text-align:center;color:#fff">
+          <div style="font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Полный расчёт — на курсе</div>
+          <div style="font-size:13px;opacity:.9;line-height:1.6;margin-bottom:16px">Составим персональный план: в какой очерёдности закрывать, сколько доп. платить, когда начать инвестировать. Считаем до рубля.</div>
+          <button class="cta-btn" onclick="window.open('https://t.me/Svetlana_Borontsoeva','_blank')">Хочу полный расчёт →</button>
+        </div>
+      </div>
+
+      <button class="btn" id="calcCreditsBtn" onclick="calcCredits()" disabled style="margin-top:4px">Рассчитать долговую нагрузку</button>
+    </div>
+
+    <!-- БЛОК НАКОПЛЕНИЙ -->
+    <div class="card" id="savings-block">
+      <div class="section-title">💰 Есть накопления? Узнайте куда их направить</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">Введите сумму свободных накоплений — покажем какие инструменты подходят именно под ваш капитал.</p>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:160px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Сумма накоплений (₽)</div>
+          <input type="number" id="savings-amount" placeholder="300 000" min="0"
+            style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Golos Text',sans-serif;font-size:15px;background:#fafaf8"
+            oninput="checkSavingsReady()">
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn" id="calcSavingsBtn" onclick="calcSavings()" disabled style="width:auto;padding:10px 20px;white-space:nowrap">Показать стратегию</button>
+        </div>
+      </div>
+
+      <div id="savings-result" class="hidden">
+
+        <!-- Быстрые пресеты -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="savings-presets"></div>
+
+        <!-- Рекомендация -->
+        <div id="savings-recommendation"></div>
+
+        <!-- CTA на курс -->
+        <div style="background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:14px;padding:20px;text-align:center;color:#fff;margin-top:4px">
+          <div style="font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Не знаете с чего начать?</div>
+          <div style="font-size:13px;opacity:.9;line-height:1.6;margin-bottom:16px">На консультации разберём конкретно ваш капитал: какой инструмент, в каком объёме, какой порядок входа.</div>
+          <button class="cta-btn" onclick="window.open('https://t.me/Svetlana_Borontsoeva','_blank')">Записаться на консультацию →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- БЛОК ПОДПИСОК -->
+    <div class="card" id="subs-block">
+      <div class="section-title">🔔 Автоматические подписки</div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">Нашли регулярные списания в вашей выписке. Проверьте — возможно часть из них уже не нужна.</p>
+      <div id="subs-list"></div>
+      <div id="subs-empty" class="hidden" style="text-align:center;padding:16px;color:var(--muted);font-size:14px">✅ Известных подписок не обнаружено</div>
+      <div id="subs-unknown-wrap" class="hidden">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.04em">Подозрительные регулярные платежи</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.5">Одинаковые суммы которые списываются каждый месяц — возможно тоже подписки</p>
+        <div id="subs-unknown-list"></div>
+      </div>
+      <div id="subs-total-row" class="hidden" style="background:var(--red-light);border-radius:10px;padding:12px 16px;margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:14px;font-weight:600;color:var(--red-dark)">💸 Итого на подписки в месяц</div>
+        <div style="font-size:18px;font-weight:700;color:var(--red-dark)" id="subs-total-amt"></div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-card">
+      <div class="cta-title">Не знаете какой сценарий ваш?</div>
+      <div class="cta-sub">На личном разборе за 60 минут разберём вашу ситуацию, составим конкретный план и определим с чего начать именно вам.</div>
+      <button class="cta-btn" id="mentorBtn">Записаться на разбор →</button>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const MENTOR_LINK='https://t.me/Svetlana_Borontsoeva';
+document.getElementById('mentorBtn').onclick=()=>window.open(MENTOR_LINK,'_blank');
+
+const LIMITS={продукты:30000,транспорт:10000,развлечения:15000,аренда:50000,связь:3000,здравоохранение:10000,одежда:10000,остальное:20000};
+const PALETTE=['#1D9E75','#378ADD','#EF9F27','#E24B4A','#7F77DD','#D4537E','#639922','#BA7517','#0F6E56','#5C95DD'];
+const SKIP_KW=['инвесткопилка','пополнение инвесткопилки','пополнения копилки'];
+const KW={
+  продукты:['пятерочка','пятёрочка','magnit','pyaterochka','pyaterochk','spar','ermolino','sp_ovoshhi','ovoshhifrukty','dostavka iz','vkusvill','frukt siti','фруктсити','ulybka radugi','улыбка','dixy','krasnoe','globus','supermarket','produkty','продукты','ryba moya','frukt'],
+  транспорт:['mos.transport','strelkacard','avtolajn','yandex*go','такси','uber'],
+  развлечения:['ivi.ru','ivi','osteriamario','vv 562','vv_7102','lovit','yandex*plus','netflix','кино'],
+  аренда:['oplata uslug mos','mos.ru'],
+  связь:['mbank.mts','mantavpnbot','oto*telegram','билайн','мегафон','tele2'],
+  здравоохранение:['gorzdrav','apteka','vita apteka','аптека','горздрав'],
+  одежда:['odezhda','ozon','ym *ozon','wildberries'],
+  переводы:['внутренний перевод','внешний перевод','внешний банковский','регулярный платеж','банковский перевод'],
+};
+
+function categorize(desc){const d=desc.toLowerCase();for(const[cat,kws]of Object.entries(KW)){if(kws.some(k=>d.includes(k)))return cat}return 'остальное'}
+function fmt(n){return Math.round(n).toLocaleString('ru-RU')+' ₽'}
+
+// Сценарии — раскрытие
+function toggleScenario(header){
+  const body=header.nextElementSibling;
+  const arrow=header.querySelector('.scenario-arrow');
+  body.classList.toggle('hidden');
+  arrow.classList.toggle('open');
+}
+
+// Мультифайл
+let fileList=[];
+const fi=document.getElementById('fileInput');
+const fi2=document.getElementById('fileInput2');
+const dz=document.getElementById('dropZone');
+
+fi.addEventListener('change',e=>{addFiles(Array.from(e.target.files))});
+fi2.addEventListener('change',e=>{addFiles(Array.from(e.target.files))});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');addFiles(Array.from(e.dataTransfer.files))});
+
+function addFiles(files){
+  files.forEach(f=>{
+    const ext=f.name.split('.').pop().toLowerCase();
+    if(!['pdf','csv','xlsx','xls'].includes(ext))return;
+    if(!fileList.find(x=>x.name===f.name))fileList.push(f);
+  });
+  renderFileList();
+}
+
+function removeFile(name){
+  fileList=fileList.filter(f=>f.name!==name);
+  renderFileList();
+}
+
+function renderFileList(){
+  const el=document.getElementById('filesList');
+  const addBtn=document.getElementById('addMoreBtn');
+  if(!fileList.length){
+    el.classList.add('hidden');
+    addBtn.classList.add('hidden');
+    document.getElementById('analyzeBtn').disabled=true;
+    return;
+  }
+  el.classList.remove('hidden');
+  addBtn.classList.remove('hidden');
+  document.getElementById('analyzeBtn').disabled=false;
+  el.innerHTML=fileList.map(f=>`
+    <div class="file-chip">
+      <span>📄</span>
+      <span class="file-chip-name">${f.name}</span>
+      <button onclick="removeFile('${f.name}')">×</button>
+    </div>`).join('');
+  document.getElementById('analyzeBtn').textContent=
+    fileList.length>1?`Анализировать ${fileList.length} выписки`:'Анализировать выписку';
+}
+
+function showErr(msg){const b=document.getElementById('errorBox');b.textContent='⚠ '+msg;b.classList.remove('hidden')}
+function setLoading(t){document.getElementById('loadingText').textContent=t}
+function showScreen(id){['screen-upload','screen-loading','screen-result'].forEach(s=>document.getElementById(s).classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+function resetUpload(){fileList=[];renderFileList();showScreen('screen-upload')}
+
+async function startAnalysis(){
+  if(!fileList.length)return;
+  showScreen('screen-loading');
+  let totalInc=0,totalExp=0,totalCats={},sources=[],totalTxList=[];
+  for(let i=0;i<fileList.length;i++){
+    const f=fileList[i];
+    setLoading(`Обрабатываем файл ${i+1} из ${fileList.length}: ${f.name}`);
+    try{
+      const ext=f.name.split('.').pop().toLowerCase();
+      let res;
+      if(ext==='pdf')res=await parsePDF(f);
+      else res=await parseExcel(f);
+      totalInc+=res.inc;
+      totalExp+=res.exp;
+      Object.entries(res.cats).forEach(([c,v])=>{totalCats[c]=(totalCats[c]||0)+v});
+      sources.push({name:f.name,inc:res.inc,exp:res.exp});
+      if(res.txList)totalTxList=totalTxList.concat(res.txList);
+    }catch(e){console.error(e)}
+  }
+  if(totalInc===0&&totalExp===0){showScreen('screen-upload');showErr('Не удалось прочитать файлы. Проверьте формат.');return}
+  render(totalInc,totalExp,totalCats,sources,totalTxList);
+}
+
+async function parsePDF(file){
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  let inc=0,exp=0,cats={},txCount=0,txList=[];
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p);
+    const content=await page.getTextContent();
+    const byY={};
+    content.items.forEach(item=>{const y=Math.round(item.transform[5]);if(!byY[y])byY[y]=[];byY[y].push({x:Math.round(item.transform[4]),t:item.str})});
+    const lines=Object.keys(byY).map(Number).sort((a,b)=>b-a).map(y=>byY[y].sort((a,b)=>a.x-b.x).map(i=>i.t).join(' ').trim()).filter(l=>l);
+    for(let i=0;i<lines.length;i++){
+      const m=lines[i].match(/^(\d{2}\.\d{2}\.\d{4})\s+(\d{2}\.\d{2}\.\d{4})\s+([+-][\d\s]+[.,]\d{2})\s*₽\s+([+-][\d\s]+[.,]\d{2})\s*₽\s+(.+?)(?:\s+(\d{4}))?\s*$/);
+      if(!m)continue;
+      const amt=parseFloat(m[4].replace(/\s/g,'').replace(',','.'));
+      if(isNaN(amt)||amt===0)continue;
+      let desc=m[5].trim();
+      if(!m[6]&&i+1<lines.length){const nx=lines[i+1];if(nx&&!nx.match(/^\d{2}\.\d{2}/)&&!nx.includes('₽')&&!nx.includes('Пополнения')){desc+=' '+nx.replace(/\s+\d{4}\s*$/,'').trim();i++}}
+      if(SKIP_KW.some(k=>desc.toLowerCase().includes(k)))continue;
+      txCount++;
+      txList.push({desc,amount:amt,date:m[1]});
+      if(amt>0)inc+=amt;else{exp+=Math.abs(amt);const c=categorize(desc);cats[c]=(cats[c]||0)+Math.abs(amt)}
+    }
+  }
+  if(txCount===0)throw new Error('Транзакции не найдены');
+  return{inc,exp,cats,txList};
+}
+
+function parseExcel(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+        if(rows.length<2){reject(new Error('Файл пустой'));return}
+        const hdr=rows[0].map(c=>String(c).toLowerCase().trim());
+        let ai=-1,di=-1;
+        hdr.forEach((h,i)=>{if(ai<0&&['сумма','amount','sum','руб'].some(k=>h.includes(k)))ai=i;if(di<0&&['описание','назначение','description','получатель','контрагент'].some(k=>h.includes(k)))di=i});
+        if(ai<0){for(let i=0;i<hdr.length;i++){const vs=rows.slice(1,15).map(r=>parseFloat(String(r[i]).replace(/[^0-9.,-]/g,'').replace(',','.')));if(vs.filter(v=>!isNaN(v)&&v!==0).length>4){ai=i;break}}}
+        if(ai<0){reject(new Error('Не найдена колонка с суммой'));return}
+        let inc=0,exp=0;const cats={};let txList=[];
+        rows.slice(1).forEach(row=>{
+          const amt=parseFloat(String(row[ai]||'').replace(/\s/g,'').replace(',','.').replace(/[^0-9.,-]/g,''));
+          if(isNaN(amt)||amt===0)return;
+          const desc=di>=0?String(row[di]||''):'';
+          if(SKIP_KW.some(k=>desc.toLowerCase().includes(k)))return;
+          txList.push({desc,amount:amt,date:''});
+          if(amt>0)inc+=amt;else{exp+=Math.abs(amt);const c=categorize(desc);cats[c]=(cats[c]||0)+Math.abs(amt)}
+        });
+        resolve({inc,exp,cats,txList});
+      }catch(err){reject(err)}
+    };
+    r.readAsArrayBuffer(file);
+  });
+}
+
+// ======== КРЕДИТНЫЙ КАЛЬКУЛЯТОР ========
+let creditCount=0;
+let lastIncome=0;
+let allTransactions=[];
+let pieInst=null;
+
+// ======== ПОДПИСКИ ========
+const KNOWN_SUBS = [
+  // Стриминг
+  {kw:['netflix','нетфликс'],         name:'Netflix',          icon:'🎬', cat:'Стриминг',  cancel:'https://www.netflix.com/cancelplan'},
+  {kw:['yandex*plus','яндекс плюс','яндекс.плюс'], name:'Яндекс Плюс', icon:'🎵', cat:'Стриминг', cancel:'https://plus.yandex.ru/portal/settings'},
+  {kw:['ivi.ru','ivi'],               name:'ИВИ',              icon:'🎥', cat:'Стриминг',  cancel:'https://www.ivi.ru/profile/subscription'},
+  {kw:['okko','окко'],                name:'Okko',             icon:'📺', cat:'Стриминг',  cancel:'https://okko.tv/settings/subscription'},
+  {kw:['more.tv','мор.тв'],           name:'More.TV',          icon:'📺', cat:'Стриминг',  cancel:'https://more.tv/settings'},
+  {kw:['premier','premier.one'],      name:'Premier',          icon:'🎞️', cat:'Стриминг',  cancel:'https://premier.one/profile/subscription'},
+  {kw:['spotify'],                    name:'Spotify',          icon:'🎶', cat:'Музыка',    cancel:'https://www.spotify.com/account/subscription/cancel'},
+  {kw:['sber zvuk','сбер звук','звук'], name:'СберЗвук',       icon:'🎵', cat:'Музыка',    cancel:'https://zvuk.com/settings'},
+  // Связь и сервисы
+  {kw:['oto*telegram','telegram premium'], name:'Telegram Premium', icon:'✈️', cat:'Связь', cancel:'https://t.me/premiumbot'},
+  {kw:['mantavpn','mantavpnbot'],     name:'VPN (MantraVPN)',  icon:'🔒', cat:'Связь',     cancel:null},
+  {kw:['mbank.mts','оплата услуг mts'], name:'МТС',           icon:'📱', cat:'Связь',     cancel:'https://lk.mts.ru'},
+  {kw:['билайн','beeline'],           name:'Билайн',           icon:'📱', cat:'Связь',     cancel:'https://my.beeline.ru'},
+  {kw:['мегафон','megafon'],          name:'МегаФон',          icon:'📱', cat:'Связь',     cancel:'https://lk.megafon.ru'},
+  {kw:['tele2','теле2'],              name:'Теле2',            icon:'📱', cat:'Связь',     cancel:'https://mylk.tele2.ru'},
+  {kw:['yota'],                       name:'Yota',             icon:'📱', cat:'Связь',     cancel:'https://my.yota.ru'},
+  // Облако и сервисы
+  {kw:['icloud','apple.com/bill','apple'],  name:'Apple / iCloud',  icon:'🍎', cat:'Облако', cancel:'https://appleid.apple.com/account/manage'},
+  {kw:['google','google one','google storage'], name:'Google One', icon:'🔵', cat:'Облако', cancel:'https://one.google.com'},
+  {kw:['dropbox'],                    name:'Dropbox',          icon:'📦', cat:'Облако',    cancel:'https://www.dropbox.com/account/plan'},
+  // Игры
+  {kw:['steam','стим'],               name:'Steam',            icon:'🎮', cat:'Игры',      cancel:'https://store.steampowered.com/subscription/'},
+  {kw:['playstation','ps store','psn'], name:'PlayStation',    icon:'🎮', cat:'Игры',      cancel:'https://store.playstation.com/'},
+  {kw:['xbox','game pass'],           name:'Xbox Game Pass',   icon:'🎮', cat:'Игры',      cancel:'https://account.microsoft.com/services'},
+  // Образование
+  {kw:['skillbox','скилбокс'],        name:'Skillbox',         icon:'📚', cat:'Обучение',  cancel:'https://go.skillbox.ru/profile'},
+  {kw:['geekbrains'],                 name:'GeekBrains',       icon:'📚', cat:'Обучение',  cancel:'https://gb.ru/cabinet'},
+  // Доставка и сервисы
+  {kw:['яндекс.про','yandex pro'],    name:'Яндекс.Про',       icon:'🚕', cat:'Сервис',    cancel:'https://pro.yandex.ru'},
+  {kw:['vprok','впрок'],              name:'Впрок (Перекрёсток)', icon:'🛒', cat:'Доставка', cancel:null},
+  // Прочее
+  {kw:['плата за оповещения','оповещения об операциях'], name:'SMS-оповещения банка', icon:'💬', cat:'Банк', cancel:null},
+  {kw:['регулярный платеж'],          name:'Регулярный платёж', icon:'🔄', cat:'Прочее',   cancel:null},
+];
+
+function detectSubscriptions(transactions) {
+  // transactions: [{desc, amount, date}]
+  const found = {};
+  const unknown = {};
+
+  transactions.forEach(tx => {
+    if (tx.amount >= 0) return; // только расходы
+    const amt = Math.abs(tx.amount);
+    if (amt < 30 || amt > 15000) return; // фильтр мусора
+    const d = tx.desc.toLowerCase();
+
+    // Ищем известные подписки
+    for (const sub of KNOWN_SUBS) {
+      if (sub.kw.some(k => d.includes(k))) {
+        const key = sub.name;
+        if (!found[key]) found[key] = { ...sub, amounts: [], dates: [] };
+        found[key].amounts.push(amt);
+        found[key].dates.push(tx.date);
+        return;
+      }
+    }
+
+    // Ищем подозрительные регулярные платежи (одинаковая сумма 2+ раза)
+    const roundAmt = Math.round(amt);
+    if (roundAmt >= 99) {
+      const key = roundAmt + '_' + d.substring(0, 20);
+      if (!unknown[key]) unknown[key] = { desc: tx.desc, amt: roundAmt, count: 0 };
+      unknown[key].count++;
+    }
+  });
+
+  return { found, unknown };
+}
+
+function renderSubscriptions(transactions) {
+  const { found, unknown } = detectSubscriptions(transactions);
+  const foundKeys = Object.keys(found);
+  const unknownItems = Object.values(unknown).filter(u => u.count >= 2).slice(0, 8);
+
+  const listEl = document.getElementById('subs-list');
+  const emptyEl = document.getElementById('subs-empty');
+  const unknownWrap = document.getElementById('subs-unknown-wrap');
+  const unknownList = document.getElementById('subs-unknown-list');
+  const totalRow = document.getElementById('subs-total-row');
+  const totalAmt = document.getElementById('subs-total-amt');
+
+  if (!foundKeys.length) {
+    emptyEl.classList.remove('hidden');
+    listEl.innerHTML = '';
+  } else {
+    emptyEl.classList.add('hidden');
+    let total = 0;
+    listEl.innerHTML = foundKeys.map(key => {
+      const s = found[key];
+      const avg = Math.round(s.amounts.reduce((a,b)=>a+b,0) / s.amounts.length);
+      total += avg;
+      const cancelLink = s.cancel
+        ? `<a class="sub-cancel" href="${s.cancel}" target="_blank">Как отменить →</a>`
+        : `<span style="font-size:11px;color:var(--muted)">Отмените в приложении</span>`;
+      return `<div class="sub-item">
+        <div class="sub-icon">${s.icon}</div>
+        <div class="sub-info">
+          <div class="sub-name">${s.name}</div>
+          <div class="sub-desc">${s.cat} · найдено ${s.amounts.length} раз</div>
+        </div>
+        <div class="sub-right">
+          <div class="sub-freq">~в месяц</div>
+          <div class="sub-amt">${fmt(avg)}</div>
+          <div style="margin-top:4px">${cancelLink}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    if (total > 0) {
+      totalRow.classList.remove('hidden');
+      totalAmt.textContent = fmt(total);
+    }
+  }
+
+  if (unknownItems.length) {
+    unknownWrap.classList.remove('hidden');
+    unknownList.innerHTML = unknownItems.map(u =>
+      `<div class="sub-unknown-item">
+        <div style="flex:1;color:var(--text)">${u.desc.substring(0,40)}${u.desc.length>40?'...':''}</div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <span style="color:var(--muted);font-size:12px">×${u.count} раза</span>
+          <span style="font-weight:600;color:var(--red-dark)">${fmt(u.amt)}</span>
+        </div>
+      </div>`
+    ).join('');
+  }
+}
+
+const SAVINGS_SCENARIOS=[
+  {max:100000,label:'До 100 000 ₽',icon:'🌱',color:'#378ADD',title:'Старт — фондовый рынок',desc:'На этом этапе главное — сформировать привычку инвестировать и разобраться с инструментами.',
+    steps:[
+      {c:'blue',t:'Подушка безопасности — приоритет №1. Минимум 3 месячных расхода на накопительном счёте или в ОФЗ.'},
+      {c:'blue',t:'Откройте ИИС — получите налоговый вычет 13% сверху к доходности.'},
+      {c:'blue',t:'Консервативные инструменты: ОФЗ, фонды облигаций, дивидендные акции крупных компаний.'},
+      {c:'blue',t:'Инвестируйте регулярно — 5 000 ₽ каждый месяц лучше чем 60 000 ₽ раз в год.'},
+    ],warn:'Не знаете что купить на фондовом рынке? Разберём на консультации — конкретные инструменты под вашу ситуацию.'},
+  {max:500000,label:'100 000 — 500 000 ₽',icon:'📈',color:'#1D9E75',title:'Рост — фондовый рынок',desc:'Капитал позволяет диверсифицироваться и начать получать ощутимый пассивный доход.',
+    steps:[
+      {c:'',t:'Фондовый рынок — основа. ОФЗ, дивидендные акции, фонды. Цель: 10-15% годовых.'},
+      {c:'',t:'Разделите портфель: 60% консервативные инструменты, 40% акции роста.'},
+      {c:'',t:'Реинвестируйте дивиденды — ускоряет рост через сложный процент.'},
+      {c:'',t:'Изучите торги по госимуществу — вход от 50-100 тыс., объект значительно дешевле рынка.'},
+    ],warn:'На консультации разберём конкретный портфель и стратегию входа в торги под ваш капитал.'},
+  {max:1000000,label:'500 000 — 1 000 000 ₽',icon:'🏆',color:'#EF9F27',title:'Масштаб — ФР + торги госимущества',desc:'Серьёзный капитал для работы сразу на нескольких направлениях.',
+    steps:[
+      {c:'amber',t:'Фондовый рынок — 40-50% капитала. Диверсифицированный портфель акций и облигаций.'},
+      {c:'amber',t:'Торги по госимуществу — 30-40% капитала. Объекты со скидкой 30-70% от рыночной цены.'},
+      {c:'amber',t:'Ликвидный резерв — 10-20% на накопительном счёте для новых возможностей.'},
+      {c:'amber',t:'Изучите механику торгов: банкротства, приватизация, муниципальное имущество.'},
+    ],warn:'Стратегию входа в торги, выбор объектов и распределение капитала — разберём детально на консультации.'},
+  {max:Infinity,label:'От 1 000 000 ₽',icon:'🏛️',color:'#7F77DD',title:'Капитал — недвижимость + ФР + торги',desc:'Полноценная инвестиционная стратегия с несколькими источниками дохода.',
+    steps:[
+      {c:'purple',t:'Недвижимость — 40-50% капитала. Покупка для аренды или перепродажи. Приоритет — ликвидные объекты.'},
+      {c:'purple',t:'Торги по госимуществу — 20-30%. Объекты значительно ниже рынка, быстрый возврат капитала.'},
+      {c:'purple',t:'Фондовый рынок — 20-30%. Дивидендный портфель для пассивного дохода.'},
+      {c:'purple',t:'Цель — несколько независимых источников дохода чтобы капитал работал без вашего участия.'},
+    ],warn:'На консультации разберём структуру капитала, конкретные объекты и инструменты под вашу ситуацию.'},
+];
+const STEP_COLORS={blue:'#378ADD',amber:'#EF9F27',purple:'#7F77DD','':'#1D9E75'};
+
+function checkSavingsReady(){
+  document.getElementById('calcSavingsBtn').disabled=!(parseFloat(document.getElementById('savings-amount').value)>0);
+}
+
+function calcSavings(){
+  const amount=parseFloat(document.getElementById('savings-amount').value)||0;
+  if(!amount)return;
+  const sc=SAVINGS_SCENARIOS.find(s=>amount<=s.max);
+  document.getElementById('savings-presets').innerHTML=SAVINGS_SCENARIOS.map(s=>{
+    const a=s===sc;
+    const demo=s.max===Infinity?1500000:s.max===1000000?700000:s.max===500000?300000:50000;
+    return`<button onclick="setSavingsAmount(${demo})" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid ${a?s.color:'var(--border)'};background:${a?s.color+'20':'transparent'};color:${a?s.color:'var(--muted)'}">${s.icon} ${s.label}</button>`;
+  }).join('');
+  const stepsHtml=sc.steps.map((s,i)=>`
+    <li style="display:flex;gap:8px;margin-bottom:8px">
+      <div style="width:20px;height:20px;border-radius:50%;background:${STEP_COLORS[s.c]||'#1D9E75'};color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${i+1}</div>
+      <div style="font-size:13px;line-height:1.6;color:#444">${s.t}</div>
+    </li>`).join('');
+  document.getElementById('savings-recommendation').innerHTML=`
+    <div style="border-left:3px solid ${sc.color};background:${sc.color}18;border-radius:0 12px 12px 0;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:24px">${sc.icon}</span>
+        <div><div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:${sc.color}">${sc.title}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Капитал: ${fmt(amount)}</div></div>
+      </div>
+      <div style="font-size:13px;color:#444;margin-bottom:12px;line-height:1.5">${sc.desc}</div>
+      <ul style="list-style:none">${stepsHtml}</ul>
+    </div>
+    <div style="background:var(--amber-light);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.5;color:#444">💡 ${sc.warn}</div>`;
+  document.getElementById('savings-result').classList.remove('hidden');
+  document.getElementById('savings-result').scrollIntoView({behavior:'smooth'});
+}
+
+function setSavingsAmount(val){
+  document.getElementById('savings-amount').value=val;
+  checkSavingsReady();calcSavings();
+}
+
+function addCredit(){
+  creditCount++;
+  const id=creditCount;
+  const container=document.getElementById('credits-list');
+  if(id===1){
+    container.innerHTML=`<div class="cr-headers">
+      <div class="cr-header-label">Название</div>
+      <div class="cr-header-label">Остаток ₽</div>
+      <div class="cr-header-label">Ставка %</div>
+      <div class="cr-header-label">Платёж ₽/мес</div>
+      <div></div>
+    </div>`;
+  }
+  const row=document.createElement('div');
+  row.className='cr-row';row.id='cr-row-'+id;
+  row.innerHTML=`
+    <input type="text" placeholder="Сбербанк / ипотека...">
+    <input type="number" placeholder="500 000" min="0">
+    <input type="number" placeholder="18" min="0" max="200" step="0.1">
+    <input type="number" placeholder="15 000" min="0">
+    <button class="cr-del" onclick="removeCredit(${id})">×</button>`;
+  container.appendChild(row);
+  row.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',checkCreditsReady));
+  document.getElementById('calcCreditsBtn').disabled=false;
+  document.getElementById('credit-result').classList.add('hidden');
+}
+
+function removeCredit(id){
+  const row=document.getElementById('cr-row-'+id);
+  if(row)row.remove();
+  if(!document.querySelectorAll('.cr-row').length){
+    document.getElementById('credits-list').innerHTML='';
+    document.getElementById('calcCreditsBtn').disabled=true;
+    document.getElementById('credit-result').classList.add('hidden');
+    creditCount=0;
+  }
+}
+
+function checkCreditsReady(){
+  const rows=document.querySelectorAll('.cr-row');
+  const hasData=[...rows].some(row=>{const inputs=row.querySelectorAll('input');return parseFloat(inputs[1].value)>0});
+  document.getElementById('calcCreditsBtn').disabled=!hasData;
+}
+
+function calcCredits(){
+  const rows=document.querySelectorAll('.cr-row');
+  let credits=[];
+  rows.forEach(row=>{
+    const inputs=row.querySelectorAll('input');
+    const name=inputs[0].value.trim()||'Кредит';
+    const balance=parseFloat(inputs[1].value)||0;
+    const rate=parseFloat(inputs[2].value)||0;
+    const payment=parseFloat(inputs[3].value)||0;
+    if(balance>0)credits.push({name,balance,rate,payment});
+  });
+  if(!credits.length)return;
+  const totalDebt=credits.reduce((s,c)=>s+c.balance,0);
+  const totalPayment=credits.reduce((s,c)=>s+c.payment,0);
+  let totalOverpay=0;
+  credits.forEach(c=>{
+    if(c.rate>0&&c.payment>0){
+      const mr=c.rate/100/12;
+      if(mr>0&&c.payment>c.balance*mr){
+        const months=Math.ceil(-Math.log(1-c.balance*mr/c.payment)/Math.log(1+mr));
+        totalOverpay+=c.payment*months-c.balance;
+      }else totalOverpay+=c.balance*c.rate/100;
+    }
+  });
+  const burden=lastIncome>0?Math.round(totalPayment/lastIncome*100):0;
+  document.getElementById('cr-total-debt').textContent=fmt(totalDebt);
+  document.getElementById('cr-total-payment').textContent=fmt(totalPayment)+'/мес';
+  document.getElementById('cr-overpay').textContent=totalOverpay>0?fmt(totalOverpay):'—';
+  const burdenEl=document.getElementById('cr-burden');
+  burdenEl.textContent=lastIncome>0?burden+'%':'загрузите выписку';
+  burdenEl.className='metric-value '+(burden>40?'negative':burden>30?'':'positive');
+  const alertEl=document.getElementById('cr-alert');
+  if(burden>50){alertEl.textContent=`🚨 Долговая нагрузка ${burden}% — критическая. Более половины дохода уходит на платежи.`;alertEl.classList.remove('hidden')}
+  else if(burden>40){alertEl.textContent=`⚠️ Долговая нагрузка ${burden}% — высокая. Норма до 30-35%. Нужна стратегия.`;alertEl.classList.remove('hidden')}
+  else if(burden>30){alertEl.textContent=`📌 Долговая нагрузка ${burden}% — выше нормы. Рекомендуется снизить до 30%.`;alertEl.classList.remove('hidden')}
+  else alertEl.classList.add('hidden');
+  const sorted=[...credits].sort((a,b)=>b.rate-a.rate);
+  document.getElementById('cr-breakdown').innerHTML=sorted.map(c=>{
+    const rc=c.rate>=20?'rate-high':c.rate>=13?'rate-mid':'rate-ok';
+    const rl=c.rate>=20?'🔴 высокая':c.rate>=13?'🟡 средняя':'🟢 норма';
+    return`<div class="cr-item"><div class="cr-item-name">${c.name}</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${c.rate>0?`<span class="cr-item-rate ${rc}">${c.rate}% — ${rl}</span>`:''}<span style="color:var(--muted);font-size:13px">${fmt(c.balance)}</span>${c.payment>0?`<span style="font-weight:600;font-size:13px">${fmt(c.payment)}/мес</span>`:''}</div></div>`;
+  }).join('');
+  document.getElementById('credit-result').classList.remove('hidden');
+  document.getElementById('credit-result').scrollIntoView({behavior:'smooth'});
+}
+
+
+function render(inc,exp,cats,sources,txList){
+  lastIncome=inc;
+  allTransactions=txList||[];
+  const bal=inc-exp,sr=inc>0?bal/inc:0;
+  const dc={...cats};delete dc['переводы'];
+  const de=Object.values(dc).reduce((a,b)=>a+b,0);
+
+  // Источники
+  const colors=['#1D9E75','#378ADD','#EF9F27','#7F77DD','#E24B4A'];
+  document.getElementById('sourcesTags').innerHTML=sources.map((s,i)=>
+    `<span class="source-tag" style="background:${colors[i%colors.length]}20;color:${colors[i%colors.length]};border:1px solid ${colors[i%colors.length]}40">
+      📄 ${s.name.replace(/\.[^.]+$/,'')}
+    </span>`).join('');
+
+  document.getElementById('r-income').textContent='+'+fmt(inc);
+  document.getElementById('r-expense').textContent='-'+fmt(exp);
+  const bel=document.getElementById('r-balance');
+  bel.textContent=(bal>=0?'+':'')+fmt(bal);
+  bel.className='metric-value '+(bal>=0?'positive':'negative');
+
+  const holes=Object.entries(dc).filter(([c,v])=>v>(LIMITS[c]||20000));
+  let score=50;
+  if(sr>=0.3)score=95;else if(sr>=0.2)score=80;else if(sr>=0.1)score=65;else if(sr>=0)score=45;else score=20;
+  score=Math.max(10,score-holes.length*8);
+
+  let rc,rb,rd;
+  if(score>=80){rc='#085041';rb='#9FE1CB';rd='Отлично! Финансы под контролем, хорошая норма сбережений.'}
+  else if(score>=60){rc='#0C447C';rb='#B5D4F4';rd='Хорошо. Есть утечки, но основа крепкая. Есть над чем поработать.'}
+  else if(score>=40){rc='#633806';rb='#FAC775';rd='Средне. Нужно разобраться с утечками и повысить норму сбережений.'}
+  else{rc='#791F1F';rb='#F7C1C1';rd='Требует внимания. Расходы превышают доходы.'}
+
+  const circ=document.getElementById('r-circle');
+  circ.textContent=score;circ.style.background=rb;circ.style.color=rc;
+  document.getElementById('r-desc').textContent=rd;
+
+  const sorted=Object.entries(dc).sort((a,b)=>b[1]-a[1]);
+  if(pieInst)pieInst.destroy();
+  pieInst=new Chart(document.getElementById('pieChart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:sorted.map(([c])=>c),datasets:[{data:sorted.map(([,v])=>Math.round(v)),backgroundColor:PALETTE,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:12},padding:10}},tooltip:{callbacks:{label:c=>' '+c.parsed.toLocaleString('ru-RU')+' ₽'}}}}
+  });
+
+  document.getElementById('r-cats').innerHTML=sorted.map(([cat,amt],i)=>
+    `<div class="cat-row"><div class="cat-dot" style="background:${PALETTE[i%PALETTE.length]}"></div><div class="cat-name">${cat}</div><div class="cat-amt">${fmt(amt)}</div><div class="cat-pct">${de>0?Math.round(amt/de*100):0}%</div></div>`
+  ).join('');
+
+  document.getElementById('r-holes').innerHTML=!holes.length
+    ?'<div class="rec-item">✅ Все категории в пределах нормы</div>'
+    :holes.sort((a,b)=>b[1]-a[1]).map(([cat,spent])=>{
+        const lim=LIMITS[cat]||20000,over=spent-lim,pct=Math.min(100,Math.round(spent/lim*100));
+        return`<div class="hole-item"><div class="hole-top"><div class="hole-cat">${cat}</div><div class="hole-badge">+${fmt(over)}</div></div><div class="hole-bar-bg"><div class="hole-bar-fill" style="width:${pct}%"></div></div><div class="hole-meta"><span>Потрачено: ${fmt(spent)}</span><span>Лимит: ${fmt(lim)}</span></div></div>`;
+      }).join('');
+
+  const recs=[];
+  if(bal<0)recs.push({t:'danger',m:`🚨 Вы в минусе на ${fmt(Math.abs(bal))}. Первый шаг — найти и закрыть утечки в расходах.`});
+  else if(sr>=0.3)recs.push({t:'',m:`✅ Откладываете ${Math.round(sr*100)}% дохода (${fmt(bal)}). Пора направить в инвестиции.`});
+  else if(sr>=0.1)recs.push({t:'',m:`👍 Норма сбережений ${Math.round(sr*100)}%. Цель — довести до 20-30% и начать инвестировать.`});
+  else recs.push({t:'warn',m:`⚠️ Норма сбережений ${Math.round(sr*100)}%. Найдите где сокращать — каждый освобождённый рубль работает на капитал.`});
+  holes.forEach(([cat,spent])=>{
+    const lim=LIMITS[cat]||20000,over=spent-lim,pct=Math.round(over/lim*100);
+    if(pct>20)recs.push({t:'danger',m:`⚠️ Сократите «${cat}» на ${fmt(over)} — перерасход ${pct}%. Эти деньги можно направить в капитал.`});
+    else recs.push({t:'warn',m:`📌 Пересмотрите «${cat}» — перерасход ${pct}%.`});
+  });
+  if(!holes.length&&bal>=0)recs.push({t:'',m:'💪 Расходы под контролем. Фокус — на увеличение дохода и инвестиции.'});
+
+  document.getElementById('r-recs').innerHTML=recs.map(r=>`<div class="rec-item ${r.t}">${r.m}</div>`).join('');
+  renderSubscriptions(allTransactions);
+  showScreen('screen-result');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
